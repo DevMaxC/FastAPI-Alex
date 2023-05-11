@@ -110,12 +110,13 @@ def generate_reply(text):
     return response['choices'][0]['message']['content']
 
 
-class Msg(BaseModel):
-    msg: str
+class Message(BaseModel):
+    keyfile_data: str
+    audio_data: str
 
 
 @app.post("/")
-async def root(request):
+async def root(request: Message):
     keyfile_data = base64.b64decode(request.get("keyfile_data", ""))
     audio_data = base64.b64decode(request.get("audio_data", ""))
 
