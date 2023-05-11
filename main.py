@@ -114,7 +114,7 @@ class Msg(BaseModel):
     msg: str
 
 
-@app.get("/")
+@app.post("/")
 async def root(request):
     keyfile_data = base64.b64decode(request.get("keyfile_data", ""))
     audio_data = base64.b64decode(request.get("audio_data", ""))
