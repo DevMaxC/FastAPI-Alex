@@ -7,6 +7,8 @@ import os
 import openai
 import requests
 import requests
+from starlette.responses import FileResponse
+
 
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/q9tuMLqYtfvnRwpnCxhr"
@@ -46,12 +48,10 @@ async def root():
     # if there is no file in the directory called "output.mp3", respond with a message saying that there is no file
     # if there is a file in the directory called "output.mp3", respond with the file in base64 format
 
-    if os.path.isfile("output.mp3"):
-        with open("output.mp3", "rb") as f:
-            encoded_audio = base64.b64encode(f.read())
-            return {encoded_audio}
-    else:
-        return {"No file found"}
+    try:
+        return FileResponse("output.mp3", media_type="audio/mpeg")
+    except FileNotFoundError:
+        return {"error": "File not found"}
 
 
 @app.post("/")
