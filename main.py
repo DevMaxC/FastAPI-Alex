@@ -105,10 +105,12 @@ async def handle_button_data(data: ButtonData):
             print("sending to openai...")
             transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-            print(transcript)
+            print(transcript.get("text"))
 
             # get the last 10 messages
             oldmessages = getOldMessages()
+            print("\n\n\n oldmessages: \n")
+            print(oldmessages)
             messages = []
 
             messages.append({"role": "system", "content": systemPrompt})
@@ -120,17 +122,19 @@ async def handle_button_data(data: ButtonData):
                 "voice_id": systemSetVoiceID
             }
 
-            for message in oldmessages:
-                role, content = message.split(",")
+            for m in oldmessages:
+                role, content = m.split(",")
                 messages.append({"role": role, "content": content})
 
             messages.append({"role": "user", "content": transcript.text})
-
+            print("\n\n\n messages: \n")
+            print(messages)
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
             )
 
+            print("\n\n\n completion: \n")
             final = completion.choices[0].get("message").get("content")
             print(final)
 
