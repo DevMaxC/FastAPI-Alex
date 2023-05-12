@@ -101,12 +101,14 @@ async def handle_button_data(data: ButtonData):
             final = completion.choices[0].get("message").get("content")
             print(final)
 
-            filesize = f.getnframes() * f.getsampwidth()
-            duration = filesize / 16000 / 2
+            response = requests.post(url, json=data, headers=headers)
+            with open('output.mp3', 'wb') as f:
+                for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                    if chunk:
+                        f.write(chunk)
 
-            with open("audio.txt", "w") as f:
-                f.write("")
+            print("Success, the file should be available via a get request")
 
-            return {"message": final}
+            return {"message": "Success, this is the transcript: "+final+" The file should be available via a get request to the same URL"}
         else:
             return {"message": "Data received"}
