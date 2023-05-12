@@ -148,9 +148,9 @@ class VoiceData(BaseModel):
 
 @app.post("/voice")
 async def setVoice(data: VoiceData):
-    print("Setting voice to "+data.voice)
+    print("Setting voice to "+data.voiceID)
     global systemSetVoiceID
-    systemSetVoiceID = data.voice
+    systemSetVoiceID = data.voiceID
     return {"voice": systemSetVoiceID}
 
 
