@@ -138,10 +138,14 @@ async def getVoice():
     return {"voice": systemSetVoiceID}
 
 
+class VoiceData(BaseModel):
+    voice: str
+
+
 @app.post("/voice")
-async def setVoice(voiceID: str):
-    print("Setting voice to "+voiceID)
-    systemSetVoiceID = voiceID
+async def setVoice(data: VoiceData):
+    print("Setting voice to "+data.voice)
+    systemSetVoiceID = data.voice
     return {"voice": systemSetVoiceID}
 
 
@@ -151,10 +155,14 @@ async def getPrompt():
     return {"prompt": systemPrompt}
 
 
+class PromptData(BaseModel):
+    prompt: str
+
+
 @app.post("/prompt")
-async def setPrompt(prompt: str):
-    print("Setting prompt to "+prompt)
-    systemPrompt = prompt
+async def setPrompt(data: PromptData):
+    print("Setting prompt to "+data.prompt)
+    systemPrompt = data.prompt
     return {"prompt": systemPrompt}
 
 
