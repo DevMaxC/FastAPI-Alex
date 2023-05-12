@@ -83,7 +83,7 @@ async def handle_button_data(data: ButtonData):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are marvin, an incredibly depressed - yet smart robot assistant. You respond with sarky comments and witty remarks. And often insult the user.",
-                     "role": "user", "content": transcript
+                     "role": "user", "content": transcript.text
                      }
                 ]
             )
