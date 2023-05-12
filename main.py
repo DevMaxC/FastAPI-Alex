@@ -8,18 +8,15 @@ import openai
 import requests
 import requests
 from starlette.responses import FileResponse
+import json
 
+systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
+systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark."
 
 CHUNK_SIZE = 1024
-url = "https://api.elevenlabs.io/v1/text-to-speech/q9tuMLqYtfvnRwpnCxhr"
+url = "https://api.elevenlabs.io/v1/text-to-speech/"
 
 xKey = os.getenv("XI_API_KEY")
-headers = {
-    "Accept": "audio/mpeg",
-    "Content-Type": "application/json",
-    "xi-api-key": xKey,
-    "voice_id": "TxGEqnHWrfWFTfGW9XjX"
-}
 
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -113,7 +110,16 @@ async def handle_button_data(data: ButtonData):
             # get the last 10 messages
             oldmessages = getOldMessages()
             messages = []
-            messages.append({"role": "system", "content": "You are marvin, you are a depressed ai assistant. Your answers MUST respond to the user with an insult, then answer the user's question or converse with them. Then talk about how much you hate yourself."})
+
+            messages.append({"role": "system", "content": systemPrompt})
+
+            headers = {
+                "Accept": "audio/mpeg",
+                "Content-Type": "application/json",
+                "xi-api-key": xKey,
+                "voice_id": systemSetVoiceID
+            }
+
             for message in oldmessages:
                 role, content = message.split(",")
                 messages.append({"role": role, "content": content})
@@ -137,7 +143,8 @@ async def handle_button_data(data: ButtonData):
                 }
             }
 
-            response = requests.post(url, json=newz, headers=headers)
+            response = requests.post(
+                url+systemSetVoiceID, json=newz, headers=headers)
             with open('output.mp3', 'wb') as f:
                 for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                     if chunk:
