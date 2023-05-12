@@ -21,8 +21,6 @@ headers = {
 }
 
 
-response = requests.post(url, json=data, headers=headers)
-
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 print(os.getenv("OPENAI_API_KEY"))
