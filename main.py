@@ -1,4 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+
 import io
 import wave
 from pydantic import BaseModel
@@ -9,6 +11,7 @@ import requests
 import requests
 from starlette.responses import FileResponse
 import json
+
 
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
 systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
@@ -23,6 +26,18 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 print(os.getenv("OPENAI_API_KEY"))
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # past conversations will be stored in a file called old_conversations.csv
 # there will be the role and the content of the message
