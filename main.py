@@ -12,18 +12,18 @@ class ButtonData(BaseModel):
 
 @app.post("/")
 async def handle_button_data(data: ButtonData):
-    try:
-        audio_data = data.audio_data
-        audio_file = io.BytesIO(audio_data)
+    # see if there is a audio.txt file
+    # if there is, append the data to the file
+    # if there isn't, create the file and write the data to it
+    with open("audio.txt", "a") as f:
+        f.write(data.audio_data)
+    return {"message": "Data received"}
 
-    except Exception as e:
-        return "Ok it didnt work in the fastapi - phase 1: " + str(e)
+# delete the audio.txt file
 
-    # return how long the audio file is in seconds
 
-    try:
-        with wave.open(audio_file, 'rb') as audio:
-            return audio.getnframes() / audio.getframerate()
-    except Exception as e:
-
-        return "Ok it didnt work in the fastapi -phase 2: " + str(e)
+@app.delete("/")
+async def delete_audio():
+    with open("audio.txt", "w") as f:
+        f.write("")
+    return {"message": "Data deleted"}
