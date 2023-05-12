@@ -32,11 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Function to get old messages from the file
 
-
-# Function to add new message to the file
-
+# Function for adding a new message to the old messages list
 
 def addNewMessage(role, content):
     messages = oldMessages
@@ -49,6 +46,7 @@ def addNewMessage(role, content):
 # Route for fetching the generated audio file
 @app.get("/")
 async def root():
+    print("Getting audio file")
     try:
         return FileResponse("output.mp3", media_type="audio/mpeg")
     except FileNotFoundError:
@@ -65,6 +63,7 @@ class ButtonData(BaseModel):
 # Route for writing an audio chunk
 @app.post("/")
 async def writeAudioChunk(data: ButtonData):
+    print("Writing audio chunk")
     with open("audio.txt", "a") as f:
         f.write(data.audio_data)
 
@@ -135,26 +134,31 @@ async def writeAudioChunk(data: ButtonData):
 # Routes for managing voice and prompt
 @app.get("/voice")
 async def getVoice():
+    print("Getting voice")
     return {"voice": systemSetVoiceID}
 
 
 @app.post("/voice")
 async def setVoice(voiceID: str):
+    print("Setting voice to "+voiceID)
     systemSetVoiceID = voiceID
     return {"voice": systemSetVoiceID}
 
 
 @app.get("/prompt")
 async def getPrompt():
+    print("Getting prompt")
     return {"prompt": systemPrompt}
 
 
 @app.post("/prompt")
 async def setPrompt(prompt: str):
+    print("Setting prompt to "+prompt)
     systemPrompt = prompt
     return {"prompt": systemPrompt}
 
 
 @app.get("/oldmessages")
 async def getOldMessagesRoute():
+    print("Getting old messages")
     return oldMessages
