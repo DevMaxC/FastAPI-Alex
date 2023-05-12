@@ -178,3 +178,9 @@ async def getPrompt():
 async def setPrompt(prompt: str):
     systemPrompt = prompt
     return {"prompt": systemPrompt}
+
+
+@app.get("/oldmessages")
+async def getOldMessages():
+    messages = getOldMessages()
+    return {"messages": messages}
