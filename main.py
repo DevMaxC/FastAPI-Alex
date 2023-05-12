@@ -12,8 +12,12 @@ class ButtonData(BaseModel):
 
 @app.post("/")
 async def handle_button_data(data: ButtonData):
-    audio_data = data.audio_data
-    audio_file = io.BytesIO(audio_data)
+    try:
+        audio_data = data.audio_data
+        audio_file = io.BytesIO(audio_data)
+
+    except Exception as e:
+        return "Ok it didnt work in the fastapi - phase 1: " + str(e)
 
     # return how long the audio file is in seconds
 
@@ -22,4 +26,4 @@ async def handle_button_data(data: ButtonData):
             return audio.getnframes() / audio.getframerate()
     except Exception as e:
 
-        return "Ok it didnt work in the fastapi: " + str(e)
+        return "Ok it didnt work in the fastapi -phase 2: " + str(e)
