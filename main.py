@@ -1,36 +1,28 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-
 import io
 import wave
-from pydantic import BaseModel
-import base64
 import os
 import openai
 import requests
-import requests
 from starlette.responses import FileResponse
-import json
+from pydantic import BaseModel
+import base64
 
-
+# Constants and configurations
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
-systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
-
+systemPrompt = ("You are Marvin a depressed ai assistant, respond to the user "
+                "with first a short an un called for insult, then reluctantly "
+                "answer their question, then finish with a self depricating remark. "
+                "Make sure to be boastful of your ai abilities.")
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/"
-
 xKey = os.getenv("XI_API_KEY")
-
-
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-print(os.getenv("OPENAI_API_KEY"))
+# Initialize FastAPI application
 app = FastAPI()
-
-origins = [
-    "http://localhost:3000",
-]
-
+origins = ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -39,14 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# past conversations will be stored in a file called old_conversations.csv
-# there will be the role and the content of the message
-# the role will be either user or assistant
-# the content will be the text of the message
-#   only store the last 10 messages
-#   if there are more than 10 messages, delete the oldest one
-#   if there are less than 10 messages, add the new message to the end of the file
-#   if there are no messages, add the new message to the end of the file
+# Function to get old messages from the file
 
 
 def getOldMessages():
@@ -58,9 +43,10 @@ def getOldMessages():
     except FileNotFoundError:
         return []
 
+# Function to add new message to the file
+
 
 def addNewMessage(role, content):
-    # if there are more than 9 messages, delete the oldest one
     messages = getOldMessages()
     if len(messages) > 9:
         messages = messages[1:]
@@ -70,33 +56,29 @@ def addNewMessage(role, content):
             f.write(message+"\n")
 
 
-class ButtonData(BaseModel):
-    audio_data: str
-    is_end: bool
-    is_first: bool
-
-
+# Route for fetching the generated audio file
 @app.get("/")
 async def root():
-    # if there is no file in the directory called "output.mp3", respond with a message saying that there is no file
-    # if there is a file in the directory called "output.mp3", respond with the file in base64 format
-
     try:
         return FileResponse("output.mp3", media_type="audio/mpeg")
     except FileNotFoundError:
         return {"error": "File not found"}
 
 
+# Pydantic model for button data
+class ButtonData(BaseModel):
+    audio_data: str
+    is_end: bool
+    is_first: bool
+
+
+# Route for writing an audio chunk
 @app.post("/")
-async def handle_button_data(data: ButtonData):
-    # see if there is a audio.txt file
-    # if there is, append the data to the file
-    # if there isn't, create the file and write the data to it
+async def writeAudioChunk(data: ButtonData):
     with open("audio.txt", "a") as f:
         f.write(data.audio_data)
 
         if data.is_first:
-            # delete all files
             if os.path.isfile("audio.txt"):
                 os.remove("audio.txt")
             if os.path.isfile("audio.wav"):
@@ -105,8 +87,6 @@ async def handle_button_data(data: ButtonData):
                 os.remove("output.mp3")
 
         if data.is_end:
-            # convert the audio.txt file to a wav file
-            # open file
             with open("audio.txt", "r") as f:
                 decoded_audio_data = base64.b64decode(f.read())
 
@@ -117,17 +97,10 @@ async def handle_button_data(data: ButtonData):
                 f.writeframes(decoded_audio_data)
 
             audio_file = open("audio.wav", "rb")
-            print("sending to openai...")
             transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-            print(transcript.get("text"))
-
-            # get the last 10 messages
             oldmessages = getOldMessages()
-            print("\n\n\n oldmessages: \n")
-            print(oldmessages)
             messages = []
-
             messages.append({"role": "system", "content": systemPrompt})
 
             headers = {
@@ -142,16 +115,12 @@ async def handle_button_data(data: ButtonData):
                 messages.append({"role": role, "content": content})
 
             messages.append({"role": "user", "content": transcript.text})
-            print("\n\n\n messages: \n")
-            print(messages)
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
             )
 
-            print("\n\n\n completion: \n")
             final = completion.choices[0].get("message").get("content")
-            print(final)
 
             newz = {
                 "text": final,
@@ -169,14 +138,12 @@ async def handle_button_data(data: ButtonData):
                     if chunk:
                         f.write(chunk)
 
-            print("Success, the file should be available via a get request")
-
             return {"message": "Success, this is the transcript: "+final+" The file should be available via a get request to the same URL"}
         else:
             return {"message": "Data received"}
 
 
-# routes to set and change the voice and prompt respectively
+# Routes for managing voice and prompt
 @app.get("/voice")
 async def getVoice():
     return {"voice": systemSetVoiceID}
