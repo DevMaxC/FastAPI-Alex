@@ -155,3 +155,26 @@ async def handle_button_data(data: ButtonData):
             return {"message": "Success, this is the transcript: "+final+" The file should be available via a get request to the same URL"}
         else:
             return {"message": "Data received"}
+
+
+# routes to set and change the voice and prompt respectively
+@app.get("/voice")
+async def getVoice():
+    return {"voice": systemSetVoiceID}
+
+
+@app.post("/voice")
+async def setVoice(voiceID: str):
+    systemSetVoiceID = voiceID
+    return {"voice": systemSetVoiceID}
+
+
+@app.get("/prompt")
+async def getPrompt():
+    return {"prompt": systemPrompt}
+
+
+@app.post("/prompt")
+async def setPrompt(prompt: str):
+    systemPrompt = prompt
+    return {"prompt": systemPrompt}
