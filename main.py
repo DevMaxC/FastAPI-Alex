@@ -186,4 +186,4 @@ async def getOldMessagesRoute():
         messages = f.readlines()
         messages = [x.strip() for x in messages]
 
-    return {"messages": messages}
+    return messages
