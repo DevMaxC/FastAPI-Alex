@@ -110,30 +110,43 @@ def generate_reply(text):
     return response['choices'][0]['message']['content']
 
 
-class Message(BaseModel):
-    keyfile_data: str
-    audio_data: str
-
-
 @app.post("/")
-async def root(request: Message):
+async def root(request):
+    print(request)
+
+    print("decoding keyfile")
     keyfile_data = base64.b64decode(request.get("keyfile_data", ""))
+    print("decoding audio")
     audio_data = base64.b64decode(request.get("audio_data", ""))
 
+    print("creating credentials")
     credentials = service_account.Credentials.from_service_account_info(
         json.loads(keyfile_data))
     client = speech.SpeechClient(credentials=credentials)
+    print("creating text to speech client")
     clientTextToSpeech = texttospeech.TextToSpeechClient(
         credentials=credentials)
 
+    print("transcribing audio")
     transcript = speech_to_text(audio_data, client)
+    print("generating reply")
     generated_reply = generate_reply(transcript)
     # Synthesize text to speech
+    print("synthesizing text to speech")
     audio_content = synthesize_text(generated_reply, clientTextToSpeech)
 
     # Save audio to Google Cloud Storage
+    print("saving to gcs")
     audio_url = save_to_gcs(audio_content, "esp-cool-bucket", credentials)
 
+    print("returning")
+    print({
+        "statusCode": 200,
+        "body": {
+            "transcript": generated_reply,
+            "audio_url": "redacted"
+        }
+    })
     return {
         "statusCode": 200,
         "body": {
