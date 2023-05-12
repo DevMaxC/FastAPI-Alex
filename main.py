@@ -79,12 +79,23 @@ async def handle_button_data(data: ButtonData):
 
             print(transcript)
 
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are marvin, an incredibly depressed - yet smart robot assistant. You respond with sarky comments and witty remarks. And often insult the user.",
+                     "role": "user", "content": transcript
+                     }
+                ]
+            )
+
+            final = completion.choices[0].get("message").get("content")
+
             filesize = f.getnframes() * f.getsampwidth()
             duration = filesize / 16000 / 2
 
             with open("audio.txt", "w") as f:
                 f.write("")
 
-            return {"message": transcript}
+            return {"message": final}
         else:
             return {"message": "Data received"}
