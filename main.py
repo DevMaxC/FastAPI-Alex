@@ -93,7 +93,7 @@ async def handle_button_data(data: ButtonData):
             final = completion.choices[0].get("message").get("content")
             print(final)
 
-            data = {
+            newz = {
                 "text": final,
                 "model_id": "eleven_monolingual_v1",
                 "voice_settings": {
@@ -102,7 +102,7 @@ async def handle_button_data(data: ButtonData):
                 }
             }
 
-            response = requests.post(url, json=data, headers=headers)
+            response = requests.post(url, json=newz, headers=headers)
             with open('output.mp3', 'wb') as f:
                 for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                     if chunk:
