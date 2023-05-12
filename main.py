@@ -89,6 +89,7 @@ async def handle_button_data(data: ButtonData):
             )
 
             final = completion.choices[0].get("message").get("content")
+            print(final)
 
             filesize = f.getnframes() * f.getsampwidth()
             duration = filesize / 16000 / 2
