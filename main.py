@@ -10,6 +10,10 @@ from pydantic import BaseModel
 import base64
 
 # Constants and configurations
+global systemSetVoiceID
+global systemPrompt
+global oldMessages
+
 oldMessages = []
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
 systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
