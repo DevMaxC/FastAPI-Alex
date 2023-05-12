@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 import io
 import wave
+from pydantic import BaseModel
 
 app = FastAPI()
 
