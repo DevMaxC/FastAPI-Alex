@@ -10,11 +10,9 @@ from pydantic import BaseModel
 import base64
 
 # Constants and configurations
+oldMessages = []
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
-systemPrompt = ("You are Marvin a depressed ai assistant, respond to the user "
-                "with first a short an un called for insult, then reluctantly "
-                "answer their question, then finish with a self depricating remark. "
-                "Make sure to be boastful of your ai abilities.")
+systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/"
 xKey = os.getenv("XI_API_KEY")
@@ -37,26 +35,15 @@ app.add_middleware(
 # Function to get old messages from the file
 
 
-def getOldMessages():
-    try:
-        with open("old_conversations.csv", "r") as f:
-            messages = f.readlines()
-            messages = [x.strip() for x in messages]
-            return messages
-    except FileNotFoundError:
-        return []
-
 # Function to add new message to the file
 
 
 def addNewMessage(role, content):
-    messages = getOldMessages()
+    messages = oldMessages
     if len(messages) > 9:
         messages = messages[1:]
     messages.append(role+","+content)
-    with open("old_conversations.csv", "w") as f:
-        for message in messages:
-            f.write(message+"\n")
+    oldMessages = messages
 
 
 # Route for fetching the generated audio file
@@ -102,7 +89,6 @@ async def writeAudioChunk(data: ButtonData):
             audio_file = open("audio.wav", "rb")
             transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-            oldmessages = getOldMessages()
             messages = []
             messages.append({"role": "system", "content": systemPrompt})
 
@@ -113,7 +99,7 @@ async def writeAudioChunk(data: ButtonData):
                 "voice_id": systemSetVoiceID
             }
 
-            for m in oldmessages:
+            for m in oldMessages:
                 role, content = m.split(",")
                 messages.append({"role": role, "content": content})
 
@@ -171,8 +157,4 @@ async def setPrompt(prompt: str):
 
 @app.get("/oldmessages")
 async def getOldMessagesRoute():
-    with open("old_conversations.csv", "r") as f:
-        messages = f.readlines()
-        messages = [x.strip() for x in messages]
-
-    return messages
+    return oldMessages
