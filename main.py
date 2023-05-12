@@ -38,6 +38,7 @@ app = FastAPI()
 class ButtonData(BaseModel):
     audio_data: str
     is_end: bool
+    is_first: bool
 
 
 @app.get("/")
@@ -60,6 +61,15 @@ async def handle_button_data(data: ButtonData):
     # if there isn't, create the file and write the data to it
     with open("audio.txt", "a") as f:
         f.write(data.audio_data)
+
+        if data.is_first:
+            # delete all files
+            if os.path.isfile("audio.txt"):
+                os.remove("audio.txt")
+            if os.path.isfile("audio.wav"):
+                os.remove("audio.wav")
+            if os.path.isfile("output.mp3"):
+                os.remove("output.mp3")
 
         if data.is_end:
             # convert the audio.txt file to a wav file
