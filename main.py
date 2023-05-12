@@ -20,14 +20,6 @@ headers = {
     "xi-api-key": xKey,
 }
 
-data = {
-    "text": "Hi! My name is Bella, nice to meet you!",
-    "model_id": "eleven_monolingual_v1",
-    "voice_settings": {
-        "stability": 0,
-        "similarity_boost": 0
-    }
-}
 
 response = requests.post(url, json=data, headers=headers)
 
@@ -100,6 +92,15 @@ async def handle_button_data(data: ButtonData):
 
             final = completion.choices[0].get("message").get("content")
             print(final)
+
+            data = {
+                "text": final,
+                "model_id": "eleven_monolingual_v1",
+                "voice_settings": {
+                    "stability": 0,
+                    "similarity_boost": 0
+                }
+            }
 
             response = requests.post(url, json=data, headers=headers)
             with open('output.mp3', 'wb') as f:
