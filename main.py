@@ -34,16 +34,12 @@ async def handle_button_data(data: ButtonData):
                     duration = wav_file.getnframes() / float(wav_file.getframerate())
             # send the wav file to the speech to text api
             # return the audio length in seconds: Datalength: n seconds
+            # delete the audio.txt file
+            with open("audio.txt", "w") as f:
+                f.write("")
 
             return {"message": "Datalength: " + str(duration) + " seconds"}
         else:
             return {"message": "Data received"}
 
 # delete the audio.txt file
-
-
-@app.delete("/")
-async def delete_audio():
-    with open("audio.txt", "w") as f:
-        f.write("")
-    return {"message": "Data deleted"}
