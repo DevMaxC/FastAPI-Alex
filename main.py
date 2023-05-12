@@ -27,6 +27,36 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 print(os.getenv("OPENAI_API_KEY"))
 app = FastAPI()
 
+# past conversations will be stored in a file called old_conversations.csv
+# there will be the role and the content of the message
+# the role will be either user or assistant
+# the content will be the text of the message
+#   only store the last 10 messages
+#   if there are more than 10 messages, delete the oldest one
+#   if there are less than 10 messages, add the new message to the end of the file
+#   if there are no messages, add the new message to the end of the file
+
+
+def getOldMessages():
+    try:
+        with open("old_conversations.csv", "r") as f:
+            messages = f.readlines()
+            messages = [x.strip() for x in messages]
+            return messages
+    except FileNotFoundError:
+        return []
+
+
+def addNewMessage(role, content):
+    # if there are more than 9 messages, delete the oldest one
+    messages = getOldMessages()
+    if len(messages) > 9:
+        messages = messages[1:]
+    messages.append(role+","+content)
+    with open("old_conversations.csv", "w") as f:
+        for message in messages:
+            f.write(message+"\n")
+
 
 class ButtonData(BaseModel):
     audio_data: str
@@ -80,13 +110,19 @@ async def handle_button_data(data: ButtonData):
 
             print(transcript)
 
+            # get the last 10 messages
+            oldmessages = getOldMessages()
+            messages = []
+            messages.append({"role": "system", "content": "You are marvin, you are a depressed ai assistant. Your answers MUST respond to the user with an insult, then answer the user's question or converse with them. Then talk about how much you hate yourself."})
+            for message in oldmessages:
+                role, content = message.split(",")
+                messages.append({"role": role, "content": content})
+
+            messages.append({"role": "user", "content": transcript.text})
+
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are marvin, you are a depressed ai assistant. Your answers MUST respond to the user with an insult, then answer the user's question or converse with them. Then talk about how much you hate yourself.",
-                     "role": "user", "content": transcript.text
-                     }
-                ]
+                messages=messages,
             )
 
             final = completion.choices[0].get("message").get("content")
