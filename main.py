@@ -18,7 +18,7 @@ headers = {
     "Accept": "audio/mpeg",
     "Content-Type": "application/json",
     "xi-api-key": xKey,
-    "voice_id": "q9tuMLqYtfvnRwpnCxhr"
+    "voice_id": "TxGEqnHWrfWFTfGW9XjX"
 }
 
 
