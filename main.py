@@ -11,7 +11,7 @@ from starlette.responses import FileResponse
 import json
 
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
-systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark."
+systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
 
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/"
@@ -181,6 +181,9 @@ async def setPrompt(prompt: str):
 
 
 @app.get("/oldmessages")
-async def getOldMessages():
-    messages = getOldMessages()
+async def getOldMessagesRoute():
+    with open("old_conversations.csv", "r") as f:
+        messages = f.readlines()
+        messages = [x.strip() for x in messages]
+
     return {"messages": messages}
