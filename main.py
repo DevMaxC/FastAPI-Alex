@@ -44,6 +44,7 @@ def addNewMessage(role, content):
     if len(messages) > 9:
         messages = messages[1:]
     messages.append(role+","+content)
+    global oldMessages
     oldMessages = messages
 
 
@@ -52,7 +53,7 @@ def addNewMessage(role, content):
 async def root():
     print("Getting audio file")
     try:
-        return FileResponse("output.mp3", media_type="audio/mpeg")
+        return FileResponse("output.mp3", media_type="application/octet-stream")
     except FileNotFoundError:
         return {"error": "File not found"}
 
