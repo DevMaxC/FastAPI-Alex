@@ -43,7 +43,7 @@ def addNewMessage(role, content):
     messages = oldMessages
     if len(messages) > 9:
         messages = messages[1:]
-    messages.append(role+","+content)
+    messages.append({"role": role, "content": content})
     global oldMessages
     oldMessages = messages
 
@@ -104,8 +104,7 @@ async def writeAudioChunk(data: ButtonData):
             }
 
             for m in oldMessages:
-                role, content = m.split(",")
-                messages.append({"role": role, "content": content})
+                messages.append(m)
 
             messages.append({"role": "user", "content": transcript.text})
             completion = openai.ChatCompletion.create(
