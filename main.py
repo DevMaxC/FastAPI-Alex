@@ -40,7 +40,6 @@ app.add_middleware(
 # Function for adding a new message to the old messages list
 
 def addNewMessage(role, content):
-    global oldMessages
     messages = oldMessages
     if len(messages) > 9:
         messages = messages[1:]
