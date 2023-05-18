@@ -16,7 +16,9 @@ global oldMessages
 
 oldMessages = []
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
-systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
+# systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
+systemPrompt = "You are an ai assistant. Respond as concisely as possible."
+
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/"
 xKey = os.getenv("XI_API_KEY")
@@ -48,11 +50,11 @@ def addNewMessage(role, content):
 
 
 # Route for fetching the generated audio file
-@app.get("/")
+@app.get("/output.mp3")
 async def root():
     print("Getting audio file")
     try:
-        return FileResponse("output.mp3", media_type="application/octet-stream")
+        return FileResponse("output.mp3", media_type="audio/mp3")
     except FileNotFoundError:
         return {"error": "File not found"}
 
