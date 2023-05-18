@@ -16,8 +16,8 @@ global oldMessages
 
 oldMessages = []
 systemSetVoiceID = "TxGEqnHWrfWFTfGW9XjX"
-# systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
-systemPrompt = "You are an ai assistant. Respond as concisely as possible."
+systemPrompt = "You are Marvin a depressed ai assistant, respond to the user with first a short an un called for insult, then reluctantly answer their question, then finish with a self depricating remark. Make sure to be boastful of your ai abilities."
+# systemPrompt = "You are an ai assistant. Respond as concisely as possible."
 
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/"
@@ -92,7 +92,8 @@ async def writeAudioChunk(data: ButtonData):
                 f.writeframes(decoded_audio_data)
 
             audio_file = open("audio.wav", "rb")
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+            transcript = openai.Audio.transcribe(
+                "whisper-1", audio_file, language="en")
 
             messages = []
             messages.append({"role": "system", "content": systemPrompt})
