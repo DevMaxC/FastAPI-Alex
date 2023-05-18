@@ -8,6 +8,7 @@ import requests
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 import base64
+import time
 
 # Constants and configurations
 global systemSetVoiceID
@@ -92,9 +93,13 @@ async def writeAudioChunk(data: ButtonData):
                 f.writeframes(decoded_audio_data)
 
             audio_file = open("audio.wav", "rb")
+
+            startTimer = time.time()
             transcript = openai.Audio.transcribe(
                 "whisper-1", audio_file, language="en")
 
+            endTimer = time.time()
+            print("Time taken to transcribe: "+str(endTimer-startTimer))
             messages = []
             messages.append({"role": "system", "content": systemPrompt})
 
@@ -109,10 +114,14 @@ async def writeAudioChunk(data: ButtonData):
                 messages.append(m)
 
             messages.append({"role": "user", "content": transcript.text})
+
+            startTimer = time.time()
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
             )
+            endTimer = time.time()
+            print("Time taken to generate: "+str(endTimer-startTimer))
 
             final = completion.choices[0].get("message").get("content")
 
@@ -125,8 +134,12 @@ async def writeAudioChunk(data: ButtonData):
                 }
             }
 
+            startTimer = time.time()
             response = requests.post(
                 url+systemSetVoiceID, json=newz, headers=headers)
+            endTimer = time.time()
+            print("Time taken to synthesize: "+str(endTimer-startTimer))
+
             with open('output.mp3', 'wb') as f:
                 for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                     if chunk:
