@@ -30,6 +30,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "https://fastapi-production-9c49.up.railway.app",
+    "https://iot-alex-proj.vercel.app/",
 ]
 app.add_middleware(
     CORSMiddleware,
