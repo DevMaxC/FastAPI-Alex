@@ -28,14 +28,11 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Initialize FastAPI application
 app = FastAPI()
 origins = [
-    "http://localhost:3000",
-    "https://fastapi-production-9c49.up.railway.app",
-    "https://iot-alex-proj.vercel.app/",
+    "*",  # Allow all origins
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
